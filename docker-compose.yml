@@ -1,0 +1,58 @@
+version: "3.7"
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: acuna-tracker-server
+    container_name: acuna-tracker-server
+    command: flask run --host=0.0.0.0
+    volumes:
+      - ./server/:/usr/src/app
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_APP: api
+      FLASK_ENV: development
+      MONGODB_DATABASE: ee461l_mongodb
+      MONGODB_USERNAME: "admin"
+      MONGODB_PASSWORD: "password"
+      MONGODB_HOST: ee461l_mongodb
+      JWT_SECRET_KEY: DUMMY_SECRET_KEY
+      CI: "false"
+    networks:
+      - app-network
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    image: acuna-tracker-client
+    container_name: acuna-tracker-client
+    command: npm start
+    volumes:
+      - ./client/:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - server
+    ports:
+      - "3000:3000"
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - REACT_APP_PROD=false
+      - REACT_APP_API_URL=http://localhost:5000/
+    networks:
+      - app-network
+  
+networks:
+  app-network:
+    driver: bridge
+volumes:
+  data-volume:
+  node_modules:
+  web-root:
+    driver: local
+  mongodbdata:
+    driver: local
+  appdata:
+    driver: local

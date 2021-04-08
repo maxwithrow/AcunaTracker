@@ -1,0 +1,2 @@
+Flask==1.1.2
+MLB-StatsAPI==1.1
